@@ -1,6 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="24dp"
+    android:id="@+id/recyclerRow">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:strokeWidth="1dp"
+        app:strokeColor="@color/black">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/nameTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="24sp"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout_editor_absoluteX="115dp"
+                android:padding="4dp"/>
+
+            <TextView
+                android:id="@+id/surnameTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="24sp"
+                app:layout_constraintTop_toBottomOf="@+id/nameTextView"
+                tools:layout_editor_absoluteX="121dp"
+                android:padding="4dp"/>
+
+            <TextView
+                android:id="@+id/phoneTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="22sp"
+                app:layout_constraintTop_toBottomOf="@+id/surnameTextView"
+                tools:layout_editor_absoluteX="120dp"
+                android:padding="4dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

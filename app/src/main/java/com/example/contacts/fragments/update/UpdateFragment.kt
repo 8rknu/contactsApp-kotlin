@@ -1,60 +1,102 @@
 package com.example.contacts.fragments.update
 
+import android.app.AlertDialog
 import android.os.Bundle
+import android.text.TextUtils
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.contacts.R
+import com.example.contacts.data.Contact
+import com.example.contacts.data.ContactViewModel
+import com.example.contacts.databinding.FragmentUpdateBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+class UpdateFragment : Fragment(),MenuProvider {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [UpdateFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class UpdateFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private val args by navArgs<UpdateFragmentArgs>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding : FragmentUpdateBinding? = null
+    private val binging get() = _binding!!
+
+    private lateinit var mContactViewModel : ContactViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        _binding = FragmentUpdateBinding.inflate(inflater,container,false)
+
+        mContactViewModel = ViewModelProvider(this).get(ContactViewModel::class.java)
+
+        binging.updateName.setText(args.currentContact.name)
+        binging.updateSurname.setText(args.currentContact.surname)
+        binging.updatePhone.setText(args.currentContact.phoneNumber)
+
+        binging.updateButton.setOnClickListener {
+            updateContact()
+        }
+
+        activity?.addMenuProvider(this,viewLifecycleOwner,Lifecycle.State.RESUMED)
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_update, container, false)
+        return binging.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment UpdateFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            UpdateFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    private fun updateContact() {
+        val name = binging.updateName.text.toString()
+        val surname = binging.updateSurname.text.toString()
+        val phoneNumber = binging.updatePhone.text.toString()
+
+        if(inputCheck(name,surname,phoneNumber)){
+            val updateContact = Contact(args.currentContact.id,name,surname,phoneNumber)
+            mContactViewModel.UpdateContact(updateContact)
+            Toast.makeText(requireContext(),"Contact updated successfully",Toast.LENGTH_LONG).show()
+            findNavController().navigate(R.id.action_updateFragment_to_listFragment)
+        }
+
+        else{
+            Toast.makeText(requireContext(),"Please fill all fields!",Toast.LENGTH_LONG).show()
+        }
     }
+
+    private fun inputCheck(name: String, surname: String, phoneNumber: String): Boolean {
+
+        return !(TextUtils.isEmpty(name) || TextUtils.isEmpty(surname) || TextUtils.isEmpty(phoneNumber))
+
+    }
+
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+
+        menuInflater.inflate(R.menu.delete_menu,menu)
+
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        if (menuItem.itemId == R.id.delte_menu){
+
+            deleteContact()
+        }
+        return super.onOptionsItemSelected(menuItem)
+    }
+
+    private fun deleteContact() {
+        val builder = AlertDialog.Builder(requireContext())
+
+        builder.setPositiveButton("Yes"){_,_ ->
+            mContactViewModel.deleteContact(args.currentContact)
+            Toast.makeText(requireContext(),"Contact deleted successfully", Toast.LENGTH_LONG).show()
+            findNavController().navigate(R.id.action_updateFragment_to_listFragment)
+        }
+        builder.setNegativeButton("No"){_,_ ->}
+        builder.setTitle("Delete Contact")
+        builder.setMessage("Are you sure you want to delete ${args.currentContact.name}")
+        builder.create().show()
+    }
+
 }
